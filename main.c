@@ -21,13 +21,26 @@ void SignalHandler(int signum);
 void PrintEval(int BufPrd[], int BufExe[], int BufJit[], int ArraySize);
 void FilePrintEval(char *FileName,int BufPrd[], int BufExe[], int BufJit[], int BufCollect[], int BufProcess[], int BufTranslate[], int ArraySize);
 /****************************************************************************/
+
+#ifdef CPUSPIN
+void CpuSpinTask(void *arg){
+	//RTIME a,b;
+	while (1){
+	rt_task_wait_period(NULL);
+	//a = rt_timer_read();
+	rt_timer_spin(SPINTIME);
+	//b = rt_timer_read();
+	//rt_printf("%d.%06d\n", ((int)b-(int)a)/1000000, ((int)b-(int)a)%1000000);
+	}
+}
+#endif
+
 void EcatCtrlTask(void *arg){
 	int iSlaveCnt;
 	int iTaskTick = 0;
 	RtmEcatPeriodEnd = rt_timer_read();
 
 	while (1){
-
 	rt_task_wait_period(NULL);
 	RtmEcatPeriodStart = rt_timer_read();
 	EcatReceiveProcessDomain();
@@ -70,7 +83,7 @@ void EcatCtrlTask(void *arg){
 	}
 	switch(sanyoServoOp){
 		case RUN:
-			if (bTimingFlag == FALSE) bTimingFlag = TRUE;		
+			if (bTimingFlag == FALSE) bTimingFlag = TRUE;
 			sanyoSetVelocity(_ALLNODE,500);
 			break;
 		case STOP:
@@ -84,12 +97,13 @@ void EcatCtrlTask(void *arg){
 	RtmEcatMasterAppTime = rt_timer_read();
 	EcatWriteAppTimeToMaster((uint64_t)RtmEcatMasterAppTime);
 
+	#ifdef PROCESS
 	volatile int i;
 	volatile int ii;
 	for(i=0;i<15000;i++){
 		ii=ii+i*2;
 	}
-
+	#endif
 	/* send process data */
 	RtmProcessTime =  rt_timer_read();
 	EcatSendProcessDomain();
@@ -173,12 +187,20 @@ int XenoInit(void){
 	rt_print_auto_init(1); //RTDK
 
 	printf("Creating Xenomai Realtime Task(s)...");
-	if(rt_task_create(&TskEcatCtrl,"EtherCAT Control", 0, 
-			  ECATCTRL_TASK_PRIORITY,ECATCTRL_TASK_MODE)){
-	
+	if(rt_task_create(&TskEcatCtrl,"EtherCAT Control", 0, ECATCTRL_TASK_PRIORITY,ECATCTRL_TASK_MODE)){
       		fprintf(stderr, "Failed to create Ecat Control Task\n");
 		return _EMBD_RET_ERR_;
 	}
+
+	#ifdef CPUSPIN
+	if(rt_task_create(&CpuSpin,"Cpu Spin", 0, CPUSPIN_TASK_PRIORITY, ECATCTRL_TASK_MODE)){
+      		fprintf(stderr, "Failed to create Cpu Spin Task\n");
+		return _EMBD_RET_ERR_;
+	}
+	#endif
+	#ifdef PROCESS
+		printf("add process\n");
+	#endif
 	printf("OK!\n");
 
 
@@ -187,13 +209,25 @@ int XenoInit(void){
 		fprintf(stderr, "Failed to Make Ecat Control Task Periodic\n");
 		return _EMBD_RET_ERR_;
 	}
-	printf("OK!\n");
 
-	printf("Starting Xenomai Realtime Task(s)...");
+	printf("Starting Xenomai Realtime Task EcatCtrl...");
 	if(rt_task_start(&TskEcatCtrl, &EcatCtrlTask, NULL)){
 		fprintf(stderr, "Failed to start Ecat Control Task\n");
 		return _EMBD_RET_ERR_;
 	}
+
+	#ifdef CPUSPIN
+	if(rt_task_set_periodic(&CpuSpin, TM_NOW, rt_timer_ns2ticks(ECATCTRL_TASK_PERIOD))){
+		fprintf(stderr, "Failed to Make Cpu Spin Task Periodic\n");
+		return _EMBD_RET_ERR_;
+	}
+
+	printf("Starting Xenomai Realtime Task CpuSpin...");
+	if(rt_task_start(&CpuSpin, &CpuSpinTask, NULL)){
+		fprintf(stderr, "Failed to start Cpu Spin Task\n");
+		return _EMBD_RET_ERR_;
+	}
+	#endif
 	printf("OK!\n");
 
 	return _EMBD_RET_SCC_;
@@ -203,8 +237,10 @@ int XenoInit(void){
 
 void XenoQuit(void){
 	rt_task_suspend(&TskEcatCtrl);
-	
+	rt_task_suspend(&CpuSpin);
 	rt_task_delete(&TskEcatCtrl);
+	rt_task_delete(&CpuSpin);
+
 	printf("\033[%dm%s\033[0m",95,"Xenomai Task(s) Deleted!\n");
 }
 

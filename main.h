@@ -49,9 +49,15 @@
 /*****************************************************************************/
 #define ECATCTRL_TASK_MODE	T_FPU|T_CPU(0)
 #define ECATCTRL_TASK_PRIORITY	(99) // xeno: 99 , preempt: 80
+#define CPUSPIN_TASK_PRIORITY	(98) // xeno: 99 , preempt: 80
 #define ECATCTRL_TASK_PERIOD	(1000000L)
+#define SEC_DURATION		(1800)
+#define CPUSPIN
+#define SPINTIME		(240000)		// us
+//#define PROCESS
 
 RT_TASK TskEcatCtrl;
+RT_TASK CpuSpin;
 RTIME 	RtmEcatMasterAppTime;
 /*****************************************************************************/
 /* Global Variables */
@@ -77,18 +83,18 @@ bool  bQuitFlag	= FALSE;
 int sanyoStatusWord[SANYODENKI_SLAVENUM] = {0,};
 int sanyoPrevStatusWord[SANYODENKI_SLAVENUM] = {0,};
 int sanyoActualVelR[SANYODENKI_SLAVENUM] = {0,};
+int VelCmds[4] = {500,510,520,530};
 /*****************************************************************************/
 /* Performance Evaluation */
 /*****************************************************************************/
 
 #define MEASURE_TIMING //enable for timing analysis
 #ifdef MEASURE_TIMING
-RTIME RtmEcatPeriodStart=0, RtmEcatPeriodEnd=0, RtmEcatExecTime=0, RtmCollectTime, RtmProcessTime, RtmTranslateTime; 
+RTIME RtmEcatPeriodStart=0, RtmEcatPeriodEnd=0, RtmEcatExecTime=0, RtmCollectTime,RtmTransmissionStart,  RtmProcessEnd, RtmProcessStart, RtmTranslateTime, RtmProcessTime; 
 int EcatPeriod, EcatExecution, EcatJitter, EcatCollect, EcatProcess, EcatTranslate;
 #define PERF_EVAL //enable to analyze EtherCAT Master Performance
 #ifdef PERF_EVAL
 
-#define SEC_DURATION	(600)
 #define BUF_SIZE	(SEC_DURATION*FREQ_PER_SEC(ECATCTRL_TASK_PERIOD)) //1 minute data for 1ms Cyclic Task
 
 int iBufEcatDataCnt = 0;
@@ -110,18 +116,6 @@ bool bTimingFlag = FALSE;
 #endif //PRINT_TIMING
 #endif //PERFEVAL
 #endif //MEASURE_TIMING
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
