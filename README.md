@@ -38,12 +38,24 @@ main.h
 |--|--|
 |StressTime(us) | CPUSPIN 이 define 되어 있을 경우 CPUSPIN_TASK 에서 지정한 시간(us) 만큼 cpu를 소모
 |filename | ECATCTRL_TASK의 데이터가 저장될 파일명
-```
-ex) ./bin/ecat-embedded 250 xenomai_stress_250us.csv
 
-    1ms 주기로 동작하는 2개의 task(ECATCTRL_TASK, CPUSPIN_TASK) 를 생성하고 CPUSPIN_TASK 에서는 250us 만큼 cpu 를 소모하도록 함
+```
+ex) 250us(25%) xenomai stress 를 사용할 경우
+    # ./bin/ecat-embedded 250 xenomai_stress_250us.csv
+
+    1ms 주기로 동작하는 2개의 task(ECATCTRL_TASK, CPUSPIN_TASK) 를 생성하고 
+    CPUSPIN_TASK 에서는 250us 만큼 cpu 를 소모하도록 함
     250us/1ms * 100 = 25% cpu 사용
 ```
+
+```
+ex) xenomai stress 를 사용하지 않을 경우(CPUSPIN 을 define 하지 않음)
+    # ./bin/ecat-embedded 0 no_xenomai_stress.csv
+
+    1ms 주기로 동작하는 1개의 task(ECATCTRL_TASK) 를 생성하여 
+    xenomai stress 를 적용하지 않은 상태로 테스트
+```
+
 아래 명령으로 TASK 들의 cpu 사용률을 관찰할 수 있다.
 
 ```
