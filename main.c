@@ -184,7 +184,9 @@ int main(int argc, char **argv){
 	}
 
 	FilePrintEval((char *)filename,BufEcatPeriodTime,BufEcatExecTime,BufEcatJitter,BufEcatCollect, BufEcatProcess, BufEcatTranslate,BufSpinTime,iBufEcatDataCnt);
+#ifdef CPUSPIN
 	FilePrintEval((char *)"spintask_period.csv",BufSpinPeriodTime,BufSpinExec,BufSpinJitter,BufEcatCollect, BufEcatProcess, BufEcatTranslate,BufSpinTime,spincnt);
+#endif
 	PrintEval(BufEcatPeriodTime,BufEcatExecTime,BufEcatJitter,iBufEcatDataCnt);
 
 	XenoQuit();
