@@ -64,12 +64,13 @@ ex) xenomai stress 를 사용하지 않을 경우(CPUSPIN 을 define 하지 않�
 
 ## 실행 결과
     프로그램 실행 때 지정한 이름의 파일로 ECATCTRL_TASK 의 데이터가 출력되고
-    spintask_period.csv 파일 로 CPUSPIN_TASK 의 데이터가 출력된다.
-    period, execution, jitter, collectTime, processTime, TranslateTime 순으로 데이터가 생성된다.
-    bbb_stress250us.csv 는 사용자가 지정한 이름으로 ECATCTRL_TASK 의 결과이다.
-    spintask_period.csv 는 CPUSPIN_TASK 의 결과이다.
     
-<img src="./image/Picture1.png" width="700" height="300">
+    spintask_period.csv 파일 로 CPUSPIN_TASK 의 데이터가 출력된다.
+    
+    period, execution, jitter, collectTime, processTime, TranslateTime 순으로 데이터가 저장된다.
+
+    
+<img src="./image/Picture1.png" width="900" height="300">
     
     
     
