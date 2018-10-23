@@ -1,2 +1,0 @@
-# LSECAT
-Ethercat Servo LSmecapion

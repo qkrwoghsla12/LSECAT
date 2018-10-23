@@ -19,18 +19,27 @@ void XenoQuit(void);
 void DoInput();
 void SignalHandler(int signum);
 void PrintEval(int BufPrd[], int BufExe[], int BufJit[], int ArraySize);
-void FilePrintEval(char *FileName,int BufPrd[], int BufExe[], int BufJit[], int BufCollect[], int BufProcess[], int BufTranslate[], int ArraySize);
+void FilePrintEval(char *FileName,int BufPrd[], int BufExe[], int BufJit[], int BufCollect[], int BufProcess[], int BufTranslate[],int Bufspintime[], int ArraySize);
 /****************************************************************************/
+int spincnt=0;
+int cpuspintime=0;
 
 #ifdef CPUSPIN
 void CpuSpinTask(void *arg){
-	//RTIME a,b;
+        RTIME start,end, execend;
+        end = rt_timer_read();
+
 	while (1){
-	rt_task_wait_period(NULL);
-	//a = rt_timer_read();
-	rt_timer_spin(SPINTIME);
-	//b = rt_timer_read();
-	//rt_printf("%d.%06d\n", ((int)b-(int)a)/1000000, ((int)b-(int)a)%1000000);
+		rt_task_wait_period(NULL);
+		rt_timer_spin(cpuspintime);
+
+                rt_timer_spin(cpuspintime);
+                BufSpinPeriodTime[spincnt] = SpinTaskPeriod = ((int)start - (int)end);
+                execend = rt_timer_read();
+                BufSpinJitter[spincnt] = MathAbsValI(SpinTaskPeriod - (int)ECATCTRL_TASK_PERIOD);
+                BufSpinExec[spincnt] = (int)execend - (int)start;
+                end = start;
+                spincnt++;
 	}
 }
 #endif
@@ -139,6 +148,16 @@ void EcatCtrlTask(void *arg){
 /****************************************************************************/
 int main(int argc, char **argv){
 	int ret = 0;
+	char *filename;
+	if(argv[1]){
+		cpuspintime = atoi(argv[1])*1000;
+		filename = argv[2];
+		//printf("spin : %d\n",cpuspintime);
+	}
+	else{
+		printf("usage : ./start.sh cpuspintime(us) filename\n");
+	}
+	printf("\nspin : %d\n",cpuspintime);
 
 	/* Interrupt Handler "ctrl+c"  */
 	signal(SIGTERM, SignalHandler);
@@ -164,9 +183,8 @@ int main(int argc, char **argv){
 		if (bQuitFlag) break;
 	}
 
-	FilePrintEval((char *)PRINT_FILENAME,BufEcatPeriodTime,
-			BufEcatExecTime,BufEcatJitter,BufEcatCollect, BufEcatProcess, BufEcatTranslate,iBufEcatDataCnt);
-
+	FilePrintEval((char *)filename,BufEcatPeriodTime,BufEcatExecTime,BufEcatJitter,BufEcatCollect, BufEcatProcess, BufEcatTranslate,BufSpinTime,iBufEcatDataCnt);
+	FilePrintEval((char *)"spintask_period.csv",BufSpinPeriodTime,BufSpinExec,BufSpinJitter,BufEcatCollect, BufEcatProcess, BufEcatTranslate,BufSpinTime,spincnt);
 	PrintEval(BufEcatPeriodTime,BufEcatExecTime,BufEcatJitter,iBufEcatDataCnt);
 
 	XenoQuit();
@@ -237,10 +255,11 @@ int XenoInit(void){
 
 void XenoQuit(void){
 	rt_task_suspend(&TskEcatCtrl);
-	rt_task_suspend(&CpuSpin);
 	rt_task_delete(&TskEcatCtrl);
+	#ifdef CPUSPIN
+	rt_task_suspend(&CpuSpin);
 	rt_task_delete(&CpuSpin);
-
+	#endif
 	printf("\033[%dm%s\033[0m",95,"Xenomai Task(s) Deleted!\n");
 }
 
@@ -274,7 +293,7 @@ void PrintEval(int BufPrd[], int BufExe[], int BufJit[], int ArraySize){
 
 /****************************************************************************/
 
-void FilePrintEval(char *FileName,int BufPrd[], int BufExe[], int BufJit[], int BufCollect[], int BufProcess[], int BufTranslate[], int ArraySize){
+void FilePrintEval(char *FileName,int BufPrd[], int BufExe[], int BufJit[], int BufCollect[], int BufProcess[], int BufTranslate[],int Bufspintime[], int ArraySize){
 
 	FILE *FileEcatTiming;
 	int iCnt;
@@ -282,7 +301,7 @@ void FilePrintEval(char *FileName,int BufPrd[], int BufExe[], int BufJit[], int 
 	FileEcatTiming = fopen(FileName, "w");
 
 	for(iCnt=0; iCnt < ArraySize; ++iCnt){
-		fprintf(FileEcatTiming,"%d.%06d,%d.%03d,%d.%03d,%d.%03d,%d.%03d,%d.%03d\n",
+		fprintf(FileEcatTiming,"%d.%06d,%d.%03d,%d.%03d,%d.%03d,%d.%03d,%d.%03d,%d.%06d\n",
 				BufPrd[iCnt]/SCALE_1M,
 				BufPrd[iCnt]%SCALE_1M,
 				BufExe[iCnt]/SCALE_1K,
@@ -294,7 +313,9 @@ void FilePrintEval(char *FileName,int BufPrd[], int BufExe[], int BufJit[], int 
 				BufProcess[iCnt]/SCALE_1K,
 				BufProcess[iCnt]%SCALE_1K,
 				BufTranslate[iCnt]/SCALE_1K,
-				BufTranslate[iCnt]%SCALE_1K);
+				BufTranslate[iCnt]%SCALE_1K,
+				Bufspintime[iCnt]/SCALE_1M,
+				Bufspintime[iCnt]%SCALE_1M);
 	}
 	fclose(FileEcatTiming);
 }

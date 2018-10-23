@@ -53,9 +53,9 @@
 #define ECATCTRL_TASK_PERIOD	(1000000L)
 #define SEC_DURATION		(1800)
 #define CPUSPIN
-#define SPINTIME		(240000)		// us
+//#define SPINTIME		(740000)		// us
 //#define PROCESS
-
+int cpuspintime;
 RT_TASK TskEcatCtrl;
 RT_TASK CpuSpin;
 RTIME 	RtmEcatMasterAppTime;
@@ -91,19 +91,23 @@ int VelCmds[4] = {500,510,520,530};
 #define MEASURE_TIMING //enable for timing analysis
 #ifdef MEASURE_TIMING
 RTIME RtmEcatPeriodStart=0, RtmEcatPeriodEnd=0, RtmEcatExecTime=0, RtmCollectTime,RtmTransmissionStart,  RtmProcessEnd, RtmProcessStart, RtmTranslateTime, RtmProcessTime; 
-int EcatPeriod, EcatExecution, EcatJitter, EcatCollect, EcatProcess, EcatTranslate;
+int EcatPeriod, EcatExecution, EcatJitter, EcatCollect, EcatProcess, EcatTranslate, SpinTaskPeriod;
 #define PERF_EVAL //enable to analyze EtherCAT Master Performance
 #ifdef PERF_EVAL
 
 #define BUF_SIZE	(SEC_DURATION*FREQ_PER_SEC(ECATCTRL_TASK_PERIOD)) //1 minute data for 1ms Cyclic Task
 
 int iBufEcatDataCnt = 0;
-int BufEcatPeriodTime[BUF_SIZE] = {0,}; 
+int BufEcatPeriodTime[BUF_SIZE] = {0,};
+int BufSpinPeriodTime[BUF_SIZE] = {0,};
 int BufEcatExecTime[BUF_SIZE] 	= {0,};
 int BufEcatJitter[BUF_SIZE]	= {0,};
 int BufEcatCollect[BUF_SIZE]	= {0,};
 int BufEcatProcess[BUF_SIZE]	= {0,};
 int BufEcatTranslate[BUF_SIZE]	= {0,};
+int BufSpinTime[BUF_SIZE]       = {0,};
+int BufSpinExec[BUF_SIZE]       = {0,};
+int BufSpinJitter[BUF_SIZE]     = {0,};
 
 bool bTimingFlag = FALSE;
 
