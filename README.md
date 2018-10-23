@@ -1,7 +1,7 @@
 # LSECAT
 Ethercat Servo LSmecapion
 
-ZYBO-Z7-20, Beagle Bone Black 에서 LS mecapion 사의 L7N 이더캣 서보를 제어하는 예제
+ZYBO-Z7-20, Beagle Bone Black 에서 LS mecapion 사의 L7N 이더캣 서보제어
 
 ## makefile 수정
 
@@ -21,17 +21,14 @@ main.h
 |ECATCTRL_TASK_PRIORITY	| L7N 이더캣 서보를 제어하는 TASK 의 우선순위|
 |CPUSPIN_TASK_PRIORITY	  | xenomai stress 를 주는 TASK 의 우선순위|
 |ECATCTRL_TASK_PERIOD    | ECATCTRL_TASK 와 CPUSPIN_TASK 의 주기|
-|SEC_DURATION            | 테스트를 수행하는 시간(s) |
-|CPUSPIN                 | define 되어 있을 경우 ECATCTRL_TASK 외에 xenomai stress TASK 추가로 생성 define 되어있지 않을 경우 ECATCTRL_TASK 만 생성|
+|SEC_DURATION            | 프로그램을 수행하는 시간(s) |
+|CPUSPIN                 | define 되어 있을 경우 ECATCTRL_TASK 외에 xenomai stress TASK 추가로 생성|
 |PROCESS                 | define 되어 있을 경우 ECATCTRL_TASK 에 연산과정추가 |
 |ECATCTRL_TASK | 이더캣 서보를 제어하는 TASK|
-|CPUSPIN_TASK  | 시스템에 부하를 주기 위해 만든 더미 TASK|
+|CPUSPIN_TASK  | 시스템에 부하를 주기 위해 만든 dummy TASK|
 
 
 ## 실행 방법
-
-bin 디렉토리에 있는 실행 아규먼트로 파일네임넣으면서 
-예 
 
 ```
 # ./bin/ecat-embedded StressTime(us) filename
@@ -39,9 +36,14 @@ bin 디렉토리에 있는 실행 아규먼트로 파일네임넣으면서
 
 |name| definition |
 |--|--|
-|StressTime(us) | CPUSPIN 이 define 되어 있을 경우 지정한 시간(us) 만큼 cpu를 소모함
+|StressTime(us) | CPUSPIN 이 define 되어 있을 경우 CPUSPIN_TASK 에서 지정한 시간(us) 만큼 cpu를 소모
 |filename | ECATCTRL_TASK의 데이터가 저장될 파일명
+```
+ex) ./bin/ecat-embedded 250 xenomai_stress_250us.csv
 
+    1ms 주기로 동작하는 2개의 task(ECATCTRL_TASK, CPUSPIN_TASK) 를 생성하고 CPUSPIN_TASK 에서는 250us 만큼 cpu 를 소모하도록 함
+    250us/1ms * 100 = 25% cpu 사용
+```
 아래 명령으로 TASK 들의 cpu 사용률을 관찰할 수 있다.
 
 ```
