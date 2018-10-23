@@ -23,7 +23,7 @@ main.h
 |ECATCTRL_TASK_PERIOD    | ECATCTRL_TASK 와 CPUSPIN_TASK 의 주기|
 |SEC_DURATION            | 프로그램을 수행하는 시간(s) |
 |CPUSPIN                 | define 되어 있을 경우 ECATCTRL_TASK 외에 xenomai stress TASK 추가로 생성|
-|PROCESS                 | define 되어 있을 경우 ECATCTRL_TASK 에 연산과정추가 |
+|PROCESS                 | define 되어 있을 경우 ECATCTRL_TASK 에 우측의 연산과정추가 <img src="./image/Picture2.png" width="50" height="30">|
 |ECATCTRL_TASK | 이더캣 서보를 제어하는 TASK|
 |CPUSPIN_TASK  | 시스템에 부하를 주기 위해 만든 dummy TASK|
 
@@ -40,7 +40,7 @@ main.h
 |filename | ECATCTRL_TASK의 데이터가 저장될 파일명
 
 ```
-ex) 250us(25%) xenomai stress 를 사용할 경우
+ex) 250us(25%) xenomai stress 를 사용할 경우(CPUSPIN 을 define 함)
     # ./bin/ecat-embedded 250 xenomai_stress_250us.csv
 
     1ms 주기로 동작하는 2개의 task(ECATCTRL_TASK, CPUSPIN_TASK) 를 생성하고 
@@ -69,7 +69,7 @@ ex) xenomai stress 를 사용하지 않을 경우(CPUSPIN 을 define 하지 않�
     bbb_stress250us.csv 는 사용자가 지정한 이름으로 ECATCTRL_TASK 의 결과이다.
     spintask_period.csv 는 CPUSPIN_TASK 의 결과이다.
     
- 
+<img src="./image/Picture1.png" width="700" height="300">
     
     
     
