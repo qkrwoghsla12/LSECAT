@@ -39,6 +39,13 @@ ex) # ./bin/ecat-embedded 250 bbb_stress250us.csv
     # watch -n 1 "cat /proc/xenomai/stat" 
       위 명령으로 TASK 들의 cpu 사용률을 관찰한다.
     
+실행 결과
+    period, execution, jitter, collectTime, processTime, TranslateTime 순으로 데이터가 생성된다.
+    bbb_stress250us.csv 는 사용자가 지정한 이름으로 ECATCTRL_TASK 의 결과이다.
+    spintask_period.csv 는 CPUSPIN_TASK 의 결과이다.
+
+    
+ 
     
     
     
