@@ -69,7 +69,7 @@ $(START):
 	"## Embedded Systems Laboratory 2015 - Raimarius Tolentino Delgado \n\n"\
 	"## Start-up for dynamically linked executable file \n\n\n\n"\
 	"export LD_LIBRARY_PATH=$(XENOMAI_PATH)/lib:$(LIB_DIR) \n"\
-	"./$(OUT_DIR)/$(OUT)\n" >> $(START).sh 
+	"./$(OUT_DIR)/$(OUT) \$$1 \$$2 \n" >> $(START).sh 
 
 $(OUT_DIR)/$(OUT): $(OBJECTS)
 	@$(MKDIR) -p $(OUT_DIR); pwd > /dev/null
