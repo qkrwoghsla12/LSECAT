@@ -1,7 +1,7 @@
 # LSECAT
 Ethercat Servo LSmecapion
 
-ZYBO-Z7-20, Beagle Bone Black 에서 LS mecapion 사의 L7N 이더캣 서보제어
+ZYBO-Z7-20, Beagle Bone Black 에서 LS mecapion 사의 L7N 이더캣 서보제어를 통한 성능평가
 
 ## makefile 수정
 
