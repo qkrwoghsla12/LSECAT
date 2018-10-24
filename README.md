@@ -29,7 +29,7 @@ ZYBO-Z7-20, Beagle Bone Black 에서 LS mecapion 사의 L7N 이더캣 서보제�
 ## 실행 방법
 
 ```
-# ./bin/ecat-embedded StressTime(us) filename
+# ./start.sh StressTime(us) filename
 ```
 
 |name| definition |
@@ -39,7 +39,7 @@ ZYBO-Z7-20, Beagle Bone Black 에서 LS mecapion 사의 L7N 이더캣 서보제�
 
 ```
 ex) 250us(25%) xenomai stress 를 사용할 경우(CPUSPIN 을 define 함)
-    # ./bin/ecat-embedded 250 xenomai_stress_250us.csv
+    # ./start.sh 250 xenomai_stress_250us.csv
 
     1ms 주기로 동작하는 2개의 task(ECATCTRL_TASK, CPUSPIN_TASK) 를 생성하고 
     CPUSPIN_TASK 에서는 250us 만큼 cpu 를 소모하도록 함
@@ -48,7 +48,7 @@ ex) 250us(25%) xenomai stress 를 사용할 경우(CPUSPIN 을 define 함)
 
 ```
 ex) xenomai stress 를 사용하지 않을 경우(CPUSPIN 을 define 하지 않음)
-    # ./bin/ecat-embedded 0 no_xenomai_stress.csv
+    # ./start.sh 0 no_xenomai_stress.csv
 
     1ms 주기로 동작하는 1개의 task(ECATCTRL_TASK) 를 생성하여 
     xenomai stress 를 적용하지 않은 상태로 테스트
