@@ -12,9 +12,7 @@ ZYBO-Z7-20, Beagle Bone Black 에서 LS mecapion 사의 L7N 이더캣 서보제�
 |LIB_DIR      | ethercat 라이브러리 경로|
 
 
-## 실험 파라미터 변경
-
-main.h
+## 실험 파라미터 변경(main.h)
 
 |name|definition |
 |--|--|
